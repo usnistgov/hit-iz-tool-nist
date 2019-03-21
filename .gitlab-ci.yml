@@ -1,13 +1,10 @@
 image: docker:latest
 
-variables:
-  DOCKER_DRIVER: overlay
-
 services:
   - docker:dind
 
 before_script:
-  - ls
+  - docker info
 
 build_image:
   script:
