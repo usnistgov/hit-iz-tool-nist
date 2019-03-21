@@ -1,3 +1,5 @@
+image: gitlab/dind
+
 before_script:
   - docker info
 
