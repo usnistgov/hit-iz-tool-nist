@@ -1,5 +1,10 @@
 image: docker:stable
 
+stages:
+  - build
+  - test
+  - deploy
+  
 variables:
     DOCKER_HOST: tcp://docker:2375/
     DOCKER_DRIVER: overlay2
@@ -9,7 +14,17 @@ services:
 
 before_script:
   - docker info
-
-build_image:
+  
+build_iz_tool:
+  stage: build
+  script: docker build -t hitdevenv .
+  
+test_apis:
+    stage: test
   script:
-    - docker build -t hitdevenv .
+    - # test
+
+deploy to hit dev server:
+    stage: deploy
+  script:
+    - # deploy
