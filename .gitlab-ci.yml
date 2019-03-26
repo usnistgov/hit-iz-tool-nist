@@ -13,12 +13,12 @@ build_iz_tool:
   script: docker build -t hitdevenv .
   
 test_apis:
-    stage: test
+  stage: test
   script:
     - # test
 
 deploy to hit dev server:
-    stage: deploy
-    script:
-        - # deploy
+  stage: deploy
+  script:
+    - # deploy
     when: manual
