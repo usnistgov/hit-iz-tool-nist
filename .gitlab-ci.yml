@@ -21,4 +21,4 @@ deploy to hit dev server:
   stage: deploy
   script:
     - # deploy
-    when: manual
+  when: manual
