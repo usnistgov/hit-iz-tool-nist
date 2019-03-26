@@ -1,5 +1,3 @@
-image: docker:stable
-
 stages:
   - build
   - test
@@ -26,5 +24,6 @@ test_apis:
 
 deploy to hit dev server:
     stage: deploy
-  script:
-    - # deploy
+    script:
+        - # deploy
+    when: manual
