@@ -44,20 +44,20 @@ RUN wget --no-verbose -O /tmp/apache-maven-3.3.9-bin.tar.gz http://www-eu.apache
 ENV MAVEN_HOME /opt/maven
 
 COPY hit-dev.nist.gov.keystore /root/
-# COPY settings.xml /root/
 
-RUN cd /root/ && git clone https://github.com/usnistgov/hit-core-xml
-
-# RUN cd /root/hit-core-xml/ && git checkout legacy
-RUN cd /root/hit-core-xml/ && mvn clean
-
-COPY settings.xml /root/.m2/
 
 RUN cd /root/ && git clone https://github.com/usnistgov/hit-core.git
-RUN cd /root/hit-core/ && mvn -U install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
+RUN cd /root/hit-core && git checkout legacy
+RUN cd /root/hit-core/ && mvn clean
+
+# COPY settings.xml /root/
+COPY settings.xml /root/.m2/
+
+# continue installation
+RUN cd /root/hit-core/ && mvn -U clean install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
 
 RUN cd /root/ && git clone https://github.com/usnistgov/hl7-profile-validation
-RUN cd /root/hl7-profile-validation && mvn -U install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
+RUN cd /root/hl7-profile-validation && mvn -U clean install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
 
 RUN cd /root/ && git clone https://github.com/usnistgov/hit-xml-validation.git
 RUN cd /root/hit-xml-validation && mvn -U clean install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
@@ -65,14 +65,13 @@ RUN cd /root/hit-xml-validation && mvn -U clean install -Djavax.net.ssl.trustSto
 RUN cd /root/ && git clone https://github.com/usnistgov/schematronValidation.git
 RUN cd /root/schematronValidation && mvn -U clean install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
 
-RUN cd /root/hit-core-xml/hit-core-xml-domain && mvn -U clean install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
-
+RUN cd /root/ && git clone https://github.com/usnistgov/hit-core-xml
 RUN cd /root/hit-core-xml/ && git checkout legacy
-#RUN cd /root/hit-core-xml && mvn -U install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
+RUN cd /root/hit-core-xml && mvn -U install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
 RUN cd /root/hit-core-xml/hit-core-xml-domain && mvn -U install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
 
 RUN cd /root/ && git clone https://github.com/usnistgov/hit-core-hl7v2.git
-RUN cd /root/hit-core-hl7v2 && git checkout master
+RUN cd /root/hit-core-hl7v2 && git checkout legacy
 RUN cd /root/hit-core-hl7v2 && mvn -U clean install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
 
 # tools for the server side and client side
@@ -97,7 +96,7 @@ RUN cd /root/ && npm install -g bower
 
 # build the IZ tool
 RUN cd /root/ && git clone https://github.com/usnistgov/hit-iz-tool
-RUN cd /root/hit-iz-tool && git checkout apps/cni-new
+RUN cd /root/hit-iz-tool && git checkout apps/nist
 RUN cd /root/hit-iz-tool/hit-iz-web/client && npm install
 
 RUN cd /root/hit-iz-tool/hit-iz-web/client && bower install --allow-root
