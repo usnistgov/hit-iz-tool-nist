@@ -23,6 +23,7 @@ test_apis:
   stage: test
   script:
     - command_to_test_api.sh
+  when: manual
 
 deploy to hit dev server:
   stage: deploy
