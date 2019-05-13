@@ -41,9 +41,9 @@ To deploy the new war file :
 
 - `git clone https://github.com/usnistgov/hit-base-tool-deploy.git`
 - `cd hit-base-tool-deploy`
-##### iztool-cni
-1) Switch to the `iztool-cni` branch
-- `git checkout iztool-cni`
+##### apps/nist
+1) Switch to the `apps/nist`` branch
+- `git checkout apps/nist`
 2) Remove old db files to ensure new resource bundle data will be loaded
 - `rm -r ./data/app/db`
 3) copy the new generated iztool.war file to container-config/hit-base-tool/app/ . Please provide the full path of the freshly generated iztool.war
