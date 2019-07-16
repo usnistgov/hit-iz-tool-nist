@@ -112,6 +112,7 @@ RUN cd /root/ && npm install -g bower
 # build the IZ tool
 RUN cd /root/ && git clone https://github.com/usnistgov/hit-iz-tool
 RUN cd /root/hit-iz-tool && git checkout apps/nist
+COPY pom_iz.xml /root/hit-iz-tool/hit-iz-web/pom.xml 
 RUN cd /root/hit-iz-tool/hit-iz-web/client && npm install
 
 RUN cd /root/hit-iz-tool/hit-iz-web/client && bower install --allow-root
