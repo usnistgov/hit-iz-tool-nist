@@ -12,27 +12,42 @@ MAINTAINER  Desire Banse
 
 # Prepare installation of Oracle Java 8
 ENV JAVA_VER 8
-ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+# ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+# ENV JAVA_HOME /opt/java-jdk/jdk1.8.0_211
 
 RUN apt-get update
 RUN apt-get -y install curl gnupg
 
-# Install git, wget, Oracle Java8
-RUN echo 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main' >> /etc/apt/sources.list && \
-    echo 'deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main' >> /etc/apt/sources.list && \
-    echo 'deb http://archive.ubuntu.com/ubuntu trusty main universe' >> /etc/apt/sources.list && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C2518248EEA14886 && \
+# Install Java8 from oracle binaries
+# RUN mkdir /opt/java-jdk
+# COPY jdk-8u211-linux-x64.tar.gz /root/
+# RUN tar -C /opt/java-jdk -zxf /root/jdk-8u211-linux-x64.tar.gz
+# RUN update-alternatives --install /usr/bin/java java /opt/java-jdk/jdk1.8.0_211/bin/java 1
+# RUN update-alternatives --install /usr/bin/javac javac /opt/java-jdk/jdk1.8.0_211/bin/javac 1
+
+RUN echo 'deb http://archive.ubuntu.com/ubuntu xenial main universe' >> /etc/apt/sources.list && \
     apt-get update && \
     apt-get install -y git wget && \
-    echo oracle-java${JAVA_VER}-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
-    apt-get install -y --force-yes --no-install-recommends oracle-java${JAVA_VER}-installer oracle-java${JAVA_VER}-set-default && \
+    apt-get install -y openjdk-8-jdk && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    rm -rf /var/cache/oracle-jdk${JAVA_VER}-installer
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Install git, wget, Oracle Java8
+#RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" >> /etc/apt/sources.list && \
+#    echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" >> /etc/apt/sources.list && \
+#    echo 'deb http://archive.ubuntu.com/ubuntu xenial main universe' >> /etc/apt/sources.list && \
+#    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C2518248EEA14886 && \
+#    apt-get update && \
+#    apt-get install -y git wget && \
+#    echo oracle-java${JAVA_VER}-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
+#    apt-get install -y --force-yes --no-install-recommends oracle-java${JAVA_VER}-installer oracle-java${JAVA_VER}-set-default && \
+#    apt-get clean && \
+#    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+#    rm -rf /var/cache/oracle-jdk${JAVA_VER}-installer
 
 # Set Oracle Java as the default Java
-RUN update-java-alternatives -s java-8-oracle
-RUN echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle" >> ~/.bashrc
+# RUN update-java-alternatives -s java-8-oracle
+# RUN echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle" >> ~/.bashrc
 
 # Install maven 3.3.9
 RUN wget --no-verbose -O /tmp/apache-maven-3.3.9-bin.tar.gz http://www-eu.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz && \
@@ -54,25 +69,25 @@ RUN cd /root/hit-core/ && mvn clean
 COPY settings.xml /root/.m2/
 
 # continue installation
-RUN cd /root/hit-core/ && mvn -U clean install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
+RUN cd /root/hit-core/ && mvn -U clean install -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true
 
 RUN cd /root/ && git clone https://github.com/usnistgov/hl7-profile-validation
-RUN cd /root/hl7-profile-validation && mvn -U clean install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
+RUN cd /root/hl7-profile-validation && mvn -U clean install -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true
 
 RUN cd /root/ && git clone https://github.com/usnistgov/hit-xml-validation.git
-RUN cd /root/hit-xml-validation && mvn -U clean install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
+RUN cd /root/hit-xml-validation && mvn -U clean install -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true
 
 RUN cd /root/ && git clone https://github.com/usnistgov/schematronValidation.git
-RUN cd /root/schematronValidation && mvn -U clean install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
+RUN cd /root/schematronValidation && mvn -U clean install -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true
 
 RUN cd /root/ && git clone https://github.com/usnistgov/hit-core-xml
 RUN cd /root/hit-core-xml/ && git checkout legacy
-RUN cd /root/hit-core-xml && mvn -U install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
-RUN cd /root/hit-core-xml/hit-core-xml-domain && mvn -U install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
+RUN cd /root/hit-core-xml && mvn -U install -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true
+RUN cd /root/hit-core-xml/hit-core-xml-domain && mvn -U install -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true
 
 RUN cd /root/ && git clone https://github.com/usnistgov/hit-core-hl7v2.git
 RUN cd /root/hit-core-hl7v2 && git checkout legacy
-RUN cd /root/hit-core-hl7v2 && mvn -U clean install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore
+RUN cd /root/hit-core-hl7v2 && mvn -U clean install -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true
 
 # tools for the server side and client side
 # RUN cd /root/ && wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
@@ -104,6 +119,6 @@ RUN cd /root/hit-iz-tool/hit-iz-web/client && bower install --allow-root
 RUN cd /root/ && npm install -g grunt
 RUN cd /root/hit-iz-tool/hit-iz-web/client && grunt build
 
-RUN cd /root/hit-iz-tool/ && mvn -U clean install -Djavax.net.ssl.trustStore=/root/hit-dev.nist.gov.keystore -Dmaven.test.skip
+RUN cd /root/hit-iz-tool/ && mvn -U clean install -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.test.skip
 
 EXPOSE 80 443
